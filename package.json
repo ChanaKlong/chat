@@ -4,13 +4,22 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --dotenv .env",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@shofipwk/tiktok-tts": "^1.1.16",
+    "autoprefixer": "^10.4.19",
+    "engine.io": "^6.6.0",
+    "nanoid": "^5.0.7",
     "nuxt": "^3.12.3",
+    "nuxt-file-storage": "^0.2.7",
+    "postcss": "^8.4.39",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "tailwindcss": "^3.4.4",
     "vue": "latest"
   }
 }
