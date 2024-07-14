@@ -8,6 +8,15 @@ export default defineNuxtConfig({
   fileStorage: {
     mount: process.cwd(),
   },
+  css: [
+    "@/assets/css/tailwind.css",
+  ],
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
   nitro: {
     experimental: {
       websocket: true,

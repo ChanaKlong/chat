@@ -12,6 +12,7 @@
   "dependencies": {
     "@shofipwk/tiktok-tts": "^1.1.16",
     "autoprefixer": "^10.4.19",
+    "daisyui": "^4.12.10",
     "engine.io": "^6.6.0",
     "nanoid": "^5.0.7",
     "nuxt": "^3.12.3",
