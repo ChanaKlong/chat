@@ -4,6 +4,9 @@ import { Server } from "socket.io";
 import { defineEventHandler } from "h3";
 import { default as tts } from "@shofipwk/tiktok-tts";
 import { nanoid } from "nanoid";
+import ffmpeg from "fluent-ffmpeg";
+import * as fs from "fs";
+ffmpeg.setFfmpegPath(useRuntimeConfig().FFMPEG_PATH);
 
 tts.config(useRuntimeConfig().TT_SSID);
 
@@ -40,8 +43,22 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
           sp[Math.floor(Math.random() * sp.length) - 1],
         )
         .then(() => {
-          msgJSON.id = id + ".mp3";
-          io.to(msgJSON.room).emit("newMsg", JSON.stringify(msgJSON));
+          ffmpeg().input(process.cwd() + `/public/sound/${id}.mp3`)
+            .output(`${process.cwd()}/public/sound/${id}.wav`)
+            .on("end", () => {
+              if (fs.existsSync(`${process.cwd()}/public/sound/${id}.wav`)) {
+                $fetch("/api/enhanced", {
+                  method: "POST",
+                  body: JSON.stringify({ id }),
+                }).then(() => {
+                  msgJSON.id = id + ".wav";
+                  io.to(msgJSON.room).emit("newMsg", JSON.stringify(msgJSON));
+                })
+              }
+            })
+            .run()
+
+          // fs.unlinkSync(process.cwd() + `/public/sound/${id}.mp3`);
         });
     });
   });

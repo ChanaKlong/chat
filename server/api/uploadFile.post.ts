@@ -1,36 +1,44 @@
 import { nanoid } from "nanoid";
+import ffmpeg from "fluent-ffmpeg";
+import fs from "fs";
 
 export default defineEventHandler(async (event) => {
-  const { files } = await readBody(event);
+  const {files} = await readBody(event);
+  const command = ffmpeg();
+  command.setFfmpegPath(useRuntimeConfig().FFMPEG_PATH);
 
-  console.log(files);
   let nid = nanoid();
-  let id = nid + "." + files[0].name.split(".").pop();
+  let id = nid + ".wav";
 
-  for (const file of files) {
-    if (file.size > 1048576 * 2.5) {
-      return {
-        status: 500,
-        error: `File size too large (2.5 MegaBytes Maximum)`,
-      };
-    }
-    if (!["audio/wav", "audio/x-wav", "audio/ogg"].includes(file.type)) {
-      return {
-        status: 500,
-        error: `.wav/.ogg files only`,
-      };
-    }
-    await storeFileLocally(
-      file, // the file object
-      nid, // you can add a name for the file or length of Unique ID that will be automatically generated!
-      "/public/sound", // the folder the file will be stored in
-    );
+  let file = files[0];
+  if (file.size > 1048576 * 2.5) {
+    return {
+      status: 500,
+      error: `File size too large (2.5 MegaBytes Maximum)`,
+    };
   }
+  await storeFileLocally(
+    file, // the file object
+    nid, // you can add a name for the file or length of Unique ID that will be automatically generated!
+    "/public/sound", // the folder the file will be stored in
+  );
+  ffmpeg().input(`${process.cwd()}/public/sound/${nid + "." + file.name.split(".").pop()}`)
+    .output(`${process.cwd()}/public/sound/${id}`)
+    .on("end", () => {
+      if (fs.existsSync(`${process.cwd()}/public/sound/${id}`)) {
+        $fetch("/api/enhanced", {
+          method: "POST",
+          body: JSON.stringify({id: nid}),
+        }).then(() => {
+          return {
+            status: 200,
+            id,
+          };
+        });
+      }
+    })
+    .run();
 
-  return {
-    status: 200,
-    id,
-  };
 });
 
 interface File {

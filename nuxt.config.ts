@@ -25,5 +25,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     TT_SSID: process.env.TT_SSID,
     C_PATH: process.cwd(),
+    FFMPEG_PATH: process.env.FFMPEG_PATH,
   },
 });
